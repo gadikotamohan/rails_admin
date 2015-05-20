@@ -35,11 +35,25 @@ module RailsAdmin
     end
 
     def cpu_usage
-      `grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}'`
+      "CPU usage #{`grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}'`}"
     end
 
     def ram_usage
-      `ram_info_custom`
+      ram_infos = [ram_used, ram_cache, ram_buffered]
+      ram_infos.delete_if{ |s| s.blank? }
+      "Ram usage #{ram_infos.join(",")}"
+    end
+
+    def ram_used
+      `free | awk '/Mem/{printf("used: %.2f%"), $3/$2*100}'`
+    end
+
+    def ram_cache
+      `free | awk '/buffers\/cache/{printf("buffers: %.2f%"), $4/($3+$4)*100}'`
+    end
+
+    def ram_buffered
+      `free | awk '/Swap/{printf(", swap: %.2f%"), $3/$2*100}'`
     end
   end
 end
