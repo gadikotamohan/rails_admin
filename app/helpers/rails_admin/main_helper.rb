@@ -33,5 +33,13 @@ module RailsAdmin
       end
       sets
     end
+
+    def cpu_usage
+      `grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}'`
+    end
+
+    def ram_usage
+      `ram_info_custom`
+    end
   end
 end
